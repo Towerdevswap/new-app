@@ -1,7 +1,24 @@
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 
 const Mining = () => {
   const router = useRouter();
+  const [username, setUsername] = useState<string | null>(null);
+  const [profilePic, setProfilePic] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.Telegram && window.Telegram.WebApp) {
+      window.Telegram.WebApp.ready();
+
+      const user = window.Telegram.WebApp.initDataUnsafe?.user;
+      if (user) {
+        // Pastikan username dan photo_url bukan undefined
+        setUsername(user.username || null);  // Jika username tidak ada, set null
+        setProfilePic(user.photo_url || null); // Jika photo_url tidak ada, set null
+      }
+    }
+  }, []);
+
 
 
   return (
@@ -9,11 +26,11 @@ const Mining = () => {
     <div className="flex mt-2 justify-between items-center text-black border border-gray-500 p-2 rounded-xl mx-2">
     <div className="flex items-center">
       <img
-        src="/images/avatar-placeholder.jpg"
+        src={profilePic || "/images/avatar-placeholder.jpg"}
         className="h-10 w-10 rounded-full mr-2"
       />
       <div>
-        <p className="text-xl">Username</p>
+        <p className="text-xl">{username || "Username"}</p>
         <p className="text-sm">🪙 200.00 BB</p>
       </div>
     </div>

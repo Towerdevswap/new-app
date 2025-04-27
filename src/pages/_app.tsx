@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { AppProps } from 'next/app'; // Import AppProps type from next/app
 import { WagmiProvider, createConfig, http } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -19,7 +20,18 @@ const config = createConfig({
 
 const queryClient = new QueryClient();
 
-function MyApp({ Component, pageProps }: AppProps) { // Use AppProps here
+function MyApp({ Component, pageProps }: AppProps) {
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.Telegram && window.Telegram.WebApp) {
+      window.Telegram.WebApp.ready(); // Menandakan bahwa aplikasi siap
+      console.log("Telegram Web App ready");
+    } else {
+      console.log("Telegram Web App API tidak tersedia");
+    }
+  }, []);
+
+
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
