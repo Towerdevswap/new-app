@@ -59,7 +59,6 @@ const Tasks = () => {
           {task.completed ? (
             <div className="flex items-center text-green-600 space-x-1">
               <FaCheckCircle />
-              <span className="text-sm">Completed</span>
             </div>
           ) : (
             <button
@@ -67,9 +66,9 @@ const Tasks = () => {
                 task.onClick();
                 handleComplete(task.id);
               }}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-2xl"
+              className=" text-white px-4 py-2 rounded-2xl"
             >
-              {task.actionText}
+              <img src="/images/arrowtask.svg" className="h-5 w-5" />
             </button>
           )}
         </div>

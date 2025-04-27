@@ -86,14 +86,14 @@ button:focus-visible {
   content: '';
   position: absolute;
   inset: 0;
-  padding: 12px; /* ← Tambah ketebalan border */
+  padding: 16px; /* ← Tambah ketebalan border */
   background: conic-gradient(
     from 0deg,
-    black,
-    yellow,
-    black,
-    yellow,
-    black
+    #9efff9,
+    #f9ffa3,
+    #9efff9,
+    #f9ffa3,
+    #9efff9
   );
   border-radius: inherit;
   z-index: -1;

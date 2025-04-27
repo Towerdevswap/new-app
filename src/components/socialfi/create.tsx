@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useRouter } from "next/router"
 
 // Define the type for the props the component will receive
 interface CreatePostProps {
@@ -6,6 +7,7 @@ interface CreatePostProps {
 }
 
 const CreatePost = ({ addPost }: CreatePostProps) => {
+  const router = useRouter();
   const [content, setContent] = useState("");
 
   const handlePost = () => {
@@ -21,7 +23,13 @@ const CreatePost = ({ addPost }: CreatePostProps) => {
   };
 
   return (
-    <div className="p-4">
+    <div className="px-4 py-2">
+    <div
+    onClick={() => router.push("/explore")} 
+    className="pb-4 flex space-x-2 items-center">
+    <img src="/images/arrowback.svg" className="w-4 h-4" />
+    <p className="text-lg"> Back </p>
+    </div>
       <textarea
         className="w-full p-2 border rounded-2xl"
         placeholder="What's on your mind?"

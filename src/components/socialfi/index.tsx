@@ -1,30 +1,39 @@
+import { useRouter } from "next/router"
 import Tabs from "./tabs";
-import CreatePost from "./create";
 import Post from "./post";
 import { useState } from "react";
 
 const Home = () => {
   const [posts, setPosts] = useState([
-    { id: "1", username: "user1", content: "This is my first post!" },
-    { id: "2", username: "user2", content: "Hello, world!" },
+    { image:"/images/rocket.svg", id: "1", username: "@maxxi", content: "Hey!! I just purchase 100 BB", date: "2h ago" },
+    { image:"/images/telegram.svg", id: "2", username: "@xblockchainer", content: "Hello, world!", date: '1day ago' },
   ]);
 
-  const addPost = (newPost: { id: string; username: string; content: string }) => {
-    setPosts((prevPosts) => [...prevPosts, newPost]);
-  };
+  const router = useRouter(); // Kalau pakai next/router
+
+
 
   return (
-    <div>
-      <CreatePost addPost={addPost} /> {/* Pass addPost as prop */}
+    <div className="relative min-h-screen">
       <Tabs />
       {posts.map((post) => (
         <Post
           key={post.id}
           postId={post.id}
+          image={post.image}
+          date={post.date}
           username={post.username}
           content={post.content}
         />
       ))}
+
+      {/* Tombol Fixed di pojok kanan bawah */}
+      <button
+        onClick={() => router.push("/createpost")}
+        className="fixed bottom-20 right-4 bg-blue-500 text-2xl text-white px-6 rounded-full shadow-lg hover:bg-blue-600"
+      >
+        +
+      </button>
     </div>
   );
 };

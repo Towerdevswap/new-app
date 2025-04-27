@@ -27,7 +27,7 @@ const Mining = () => {
     <div className="flex flex-col justify-center items-center  text-black text-center">
     <div className="my-6 glow-border rounded-full p-4 text-center bg-black/80">
       <p className="text-black">In Progress</p>
-      <h1 className="text-5xl font-bold mb-4 text-black ">$0.000</h1>
+      <h1 className="text-5xl font-bold mb-6 text-black ">$0.000</h1>
       <div>
         <h1 className="text-xs font-bold mb-2 text-black ">+7.4 BB/Hour</h1>
       </div>

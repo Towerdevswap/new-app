@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useRouter } from "next/router";
 
 type Post = {
   id: number;
@@ -28,6 +29,7 @@ const mockUser = {
 };
 
 const Profile = () => {
+  const router = useRouter();
   const [tab, setTab] = useState<"activity" | "post">("activity");
 
   return (
@@ -51,7 +53,8 @@ const Profile = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex justify-around mt-6 border-b">
+      <div className="flex justify-between mt-6 mb-2 border-b">
+      <div>
         <button
           onClick={() => setTab("activity")}
           className={`py-1 px-4 font-medium ${
@@ -67,6 +70,13 @@ const Profile = () => {
           }`}
         >
           Posts
+        </button>
+        </div>
+        <button
+        onClick={() => router.push("/portfolio")}
+          className="py-1 px-4 flex bg-yellow-300 rounded-xl items-center text-sm"
+        >
+          <img src="/images/wallet2.svg" className="h-6 w-6 items-center mr-2" alt="Wallet" />Portfolio
         </button>
       </div>
 

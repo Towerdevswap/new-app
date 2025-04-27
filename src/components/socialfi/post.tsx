@@ -1,21 +1,32 @@
-// components/Post.tsx
-import Like from "./Like";
-import Comment from "./Comment";
-
 interface PostProps {
+  image: string;
   username: string;
   content: string;
   postId: string;
+  date: string;
+  likeCount: number;
+  commentCount: number;
+  shareCount: number;
 }
 
-const Post = ({ username, content, postId }: PostProps) => {
+const Post = ({ image, username, content, postId, date, likeCount, commentCount, shareCount }: PostProps) => {
   return (
-    <div className="border-b p-4">
-      <h3 className="font-bold">{username}</h3>
-      <p className="text-gray-700">{content}</p>
-      <div className="flex justify-between items-center mt-2">
-        <Like postId={postId} />
-        <Comment postId={postId} />
+    <div className="flex gap-2 border-b p-4">
+      <img src={image} className="w-8 h-8 rounded-full" />
+      <div className="flex-1 mb-2">
+        <div className="mb-2">
+          <h3 className="text-xl font-bold">{username}</h3>
+          <p className="text-xs text-gray-400 -mt-1">{date}</p>
+        </div>
+        <p className="text-gray-700">{content}</p>
+
+        {/* Count Section */}
+        <div className="flex justify-between items-center mt-4 text-sm text-gray-500">
+          <div className="flex gap-1"><img src="/images/like.svg" className="w-5 h-5" /> {likeCount} likes</div>
+          <div className="flex gap-1"><img src="/images/comment.svg" className="w-6 h-6" /> {commentCount} comments</div>
+          <div className="flex gap-1"><img src="/images/share.svg" className="w-5 h-5" /> {shareCount} share</div>
+        </div>
+
       </div>
     </div>
   );
