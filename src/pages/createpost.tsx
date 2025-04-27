@@ -2,7 +2,7 @@ import { useState } from "react";
 import CreateComponent from "../components/socialfi/create";
 
 export default function Create() {
-  const [posts, setPosts] = useState([
+  const [, setPosts] = useState([
     // Contoh post awal
     { id: "1", username: "@maxxi", content: "Hello World!" },
   ]);

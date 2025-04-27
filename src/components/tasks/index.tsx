@@ -66,7 +66,7 @@ const Tasks = () => {
                 task.onClick();
                 handleComplete(task.id);
               }}
-              className=" text-white px-4 py-2 rounded-2xl"
+              className="text-white px-4 py-2 rounded-2xl"
             >
               <img src="/images/arrowtask.svg" className="h-5 w-5" />
             </button>

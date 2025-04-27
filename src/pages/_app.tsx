@@ -1,13 +1,13 @@
 import { useEffect } from "react";
-import { AppProps } from 'next/app'; // Import AppProps type from next/app
+import { AppProps } from 'next/app';
 import { WagmiProvider, createConfig, http } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { base } from 'wagmi/chains';
-import { injected } from 'wagmi/connectors'; // perlu import connector
-import WebApp from '@twa-dev/sdk';
+import { injected } from 'wagmi/connectors';
 import Navbar from "../components/menu/Navbar";
 import BottomMenu from "../components/menu/BottomMenu";
 import "../styles/globals.css";
+
 
 const config = createConfig({
   chains: [base],
@@ -15,7 +15,7 @@ const config = createConfig({
     [base.id]: http(),
   },
   ssr: true,
-  connectors: [injected()], // ini sebagai pengganti autoConnect
+  connectors: [injected()],
 });
 
 const queryClient = new QueryClient();
@@ -23,9 +23,13 @@ const queryClient = new QueryClient();
 function MyApp({ Component, pageProps }: AppProps) {
 
   useEffect(() => {
-    if (typeof window !== "undefined" && window.Telegram && window.Telegram.WebApp) {
-      WebApp.ready();  // Inisialisasi WebApp hanya ketika konteks Telegram Web App tersedia
+    if (typeof window !== 'undefined') {
+      // Akses `window` atau SDK di sini
+      import('@twa-dev/sdk').then((WebApp) => {
+        WebApp.default.ready(); // Menggunakan WebApp di client-side
+      });
     }
+
   }, []);
 
   return (

@@ -3,24 +3,26 @@ import { useRouter } from "next/router";
 
 const Mining = () => {
   const router = useRouter();
-
   // State untuk menyimpan data pengguna
   const [username, setUsername] = useState<string | null>(null);
   const [profilePic, setProfilePic] = useState<string | null>(null);
   const [balance] = useState<number>(200.00); // Mocked balance
 
-  // Mengambil data pengguna dari Telegram Web App saat halaman dimuat
   useEffect(() => {
-    if (typeof window !== "undefined" && window.Telegram && window.Telegram.WebApp) {
-      window.Telegram.WebApp.ready();
-
-      const user = window.Telegram.WebApp.initDataUnsafe?.user;
-      if (user) {
-        // Pastikan username dan photo_url bukan undefined
-        setUsername(user.username || null);  // Jika username tidak ada, set null
-        setProfilePic(user.photo_url || null); // Jika photo_url tidak ada, set null
+    // Langsung mengimpor WebApp dari @twa-dev/sdk tanpa menggunakan dynamic
+    import('@twa-dev/sdk').then((WebAppModule) => {
+      const WebApp = WebAppModule.default; // Memastikan menggunakan WebApp dari SDK
+      if (WebApp && WebApp.initDataUnsafe) {
+        const userData = WebApp.initDataUnsafe.user;
+        if (userData && userData.username) {
+          setUsername(userData.username);
+          console.log('Username:', userData.username);
+          setProfilePic(userData.photo_url || null);
+        }
       }
-    }
+    }).catch((error) => {
+      console.error("Error loading WebApp module:", error);
+    });
   }, []);
 
 
@@ -52,9 +54,8 @@ const Mining = () => {
           Streak: Day 2
         </p>
         <button
-          onClick={() => router.push("/dailyclaim")}
-          className="text-lg text-black bg-yellow-500 py-2 px-4 rounded-2xl shadow"
-        >
+        onClick={() => router.push("/dailyclaim")}
+        className="text-lg text-black bg-yellow-500 py-2 px-4 rounded-2xl shadow">
           Daily Bonus
         </button>
       </div>
@@ -67,11 +68,34 @@ const Mining = () => {
 
       {/* Featured Options */}
       <div className="flex justify-around text-sm text-center pt-4 pb-2">
-        {[{ label: "Premium", image: "premium.svg" }, { label: "Launchpad", image: "rocket.svg" }, { label: "SocialFi", image: "feed.svg" }, { label: "Staking", image: "earn.svg" }].map(({ label, image }, i) => (
+        {[
+          { label: "Premium", image: "premium.svg" },
+          { label: "Launchpad", image: "rocket.svg" },
+          { label: "SocialFi", image: "feed.svg" },
+          { label: "Staking", image: "earn.svg" },
+        ].map(({ label, image }, i) => (
           <div key={i} className="flex flex-col items-center space-y-1">
             <img
               src={`/images/${image}`}
               className="h-8 w-8"
+              alt={label}
+            />
+            <span>{label}</span>
+          </div>
+        ))}
+      </div>
+
+      <div className="flex justify-around text-sm text-center py-2">
+        {[
+          { label: "Referral", image: "referral.svg" },
+          { label: "Revenue", image: "revenue.svg" },
+          { label: "Boost", image: "boost.svg" },
+          { label: "Games", image: "games.svg" },
+        ].map(({ label, image }, i) => (
+          <div key={i} className="flex flex-col items-center space-y-1">
+            <img
+              src={`/images/${image}`}
+              className="h-8 w-8 "
               alt={label}
             />
             <span>{label}</span>
@@ -84,7 +108,12 @@ const Mining = () => {
         <p>Join Community</p>
       </div>
       <div className="flex justify-around text-sm text-center py-4 mb-12">
-        {[{ label: "Telegram", image: "telegram.svg" }, { label: "Twitter", image: "twitter.svg" }, { label: "Discord", image: "discord.svg" }, { label: "Medium", image: "medium.svg" }].map(({ label, image }, i) => (
+        {[
+          { label: "Telegram", image: "telegram.svg" },
+          { label: "Twitter", image: "twitter.svg" },
+          { label: "Discord", image: "discord.svg" },
+          { label: "Medium", image: "medium.svg" },
+        ].map(({ label, image }, i) => (
           <div key={i} className="flex flex-col items-center space-y-1">
             <img
               src={`/images/${image}`}
@@ -95,6 +124,7 @@ const Mining = () => {
           </div>
         ))}
       </div>
+
     </div>
   );
 };

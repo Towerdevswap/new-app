@@ -1,22 +1,27 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 
+
 const Mining = () => {
   const router = useRouter();
   const [username, setUsername] = useState<string | null>(null);
   const [profilePic, setProfilePic] = useState<string | null>(null);
 
   useEffect(() => {
-    if (typeof window !== "undefined" && window.Telegram && window.Telegram.WebApp) {
-      window.Telegram.WebApp.ready();
-
-      const user = window.Telegram.WebApp.initDataUnsafe?.user;
-      if (user) {
-        // Pastikan username dan photo_url bukan undefined
-        setUsername(user.username || null);  // Jika username tidak ada, set null
-        setProfilePic(user.photo_url || null); // Jika photo_url tidak ada, set null
+    // Langsung mengimpor WebApp dari @twa-dev/sdk tanpa menggunakan dynamic
+    import('@twa-dev/sdk').then((WebAppModule) => {
+      const WebApp = WebAppModule.default; // Memastikan menggunakan WebApp dari SDK
+      if (WebApp && WebApp.initDataUnsafe) {
+        const userData = WebApp.initDataUnsafe.user;
+        if (userData && userData.username) {
+          setUsername(userData.username);
+          console.log('Username:', userData.username);
+          setProfilePic(userData.photo_url || null);
+        }
       }
-    }
+    }).catch((error) => {
+      console.error("Error loading WebApp module:", error);
+    });
   }, []);
 
   return (
