@@ -1,17 +1,15 @@
-import { useRouter } from "next/router"
+import { useRouter } from "next/router";
 import Tabs from "./tabs";
 import Post from "./post";
 import { useState } from "react";
 
 const Home = () => {
-  const [posts, setPosts] = useState([
-    { image:"/images/rocket.svg", id: "1", username: "@maxxi", content: "Hey!! I just purchase 100 BB", date: "2h ago" },
-    { image:"/images/telegram.svg", id: "2", username: "@xblockchainer", content: "Hello, world!", date: '1day ago' },
+  const [posts] = useState([
+    { image: "/images/rocket.svg", id: "1", username: "@maxxi", content: "Hey!! I just purchase 100 BB", date: "2h ago", likeCount: 0, commentCount: 0, shareCount: 0 },
+    { image: "/images/telegram.svg", id: "2", username: "@xblockchainer", content: "Hello, world!", date: '1day ago', likeCount: 0, commentCount: 0, shareCount: 0 },
   ]);
 
-  const router = useRouter(); // Kalau pakai next/router
-
-
+  const router = useRouter();
 
   return (
     <div className="relative min-h-screen">
@@ -19,11 +17,13 @@ const Home = () => {
       {posts.map((post) => (
         <Post
           key={post.id}
-          postId={post.id}
           image={post.image}
           date={post.date}
           username={post.username}
           content={post.content}
+          likeCount={post.likeCount}
+          commentCount={post.commentCount}
+          shareCount={post.shareCount}
         />
       ))}
 

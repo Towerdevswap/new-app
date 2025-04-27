@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useRouter } from "next/router"
+import { useRouter } from "next/router";
 
 // Define the type for the props the component will receive
 interface CreatePostProps {
@@ -24,22 +24,17 @@ const CreatePost = ({ addPost }: CreatePostProps) => {
 
   return (
     <div className="px-4 py-2">
-    <div
-    onClick={() => router.push("/explore")} 
-    className="pb-4 flex space-x-2 items-center">
-    <img src="/images/arrowback.svg" className="w-4 h-4" />
-    <p className="text-lg"> Back </p>
-    </div>
+      <div onClick={() => router.push("/explore")} className="pb-4 flex space-x-2 items-center">
+        <img src="/images/arrowback.svg" className="w-4 h-4" />
+        <p className="text-lg"> Back </p>
+      </div>
       <textarea
         className="w-full p-2 border rounded-2xl"
         placeholder="What's on your mind?"
         value={content}
         onChange={(e) => setContent(e.target.value)}
       />
-      <button
-        onClick={handlePost}
-        className="mt-2 bg-blue-500 text-white py-1 px-4 rounded-xl"
-      >
+      <button onClick={handlePost} className="mt-2 bg-blue-500 text-white py-1 px-4 rounded-xl">
         Post
       </button>
     </div>

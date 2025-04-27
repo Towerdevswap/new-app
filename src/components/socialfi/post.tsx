@@ -2,14 +2,13 @@ interface PostProps {
   image: string;
   username: string;
   content: string;
-  postId: string;
   date: string;
   likeCount: number;
   commentCount: number;
   shareCount: number;
 }
 
-const Post = ({ image, username, content, postId, date, likeCount, commentCount, shareCount }: PostProps) => {
+const Post = ({ image, username, content, date, likeCount, commentCount, shareCount }: PostProps) => {
   return (
     <div className="flex gap-2 border-b p-4">
       <img src={image} className="w-8 h-8 rounded-full" />
