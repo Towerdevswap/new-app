@@ -15,15 +15,6 @@ export default function Create() {
   return (
     <>
       <CreateComponent addPost={addPost} />
-      {/* Tampilkan semua posts untuk pengujian */}
-      <div>
-        {posts.map((post) => (
-          <div key={post.id}>
-            <h3>{post.username}</h3>
-            <p>{post.content}</p>
-          </div>
-        ))}
-      </div>
     </>
   );
 }

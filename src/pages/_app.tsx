@@ -4,7 +4,7 @@ import { WagmiProvider, createConfig, http } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { base } from 'wagmi/chains';
 import { injected } from 'wagmi/connectors'; // perlu import connector
-
+import WebApp from '@twa-dev/sdk';
 import Navbar from "../components/menu/Navbar";
 import BottomMenu from "../components/menu/BottomMenu";
 import "../styles/globals.css";
@@ -24,13 +24,9 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   useEffect(() => {
     if (typeof window !== "undefined" && window.Telegram && window.Telegram.WebApp) {
-      window.Telegram.WebApp.ready(); // Menandakan bahwa aplikasi siap
-      console.log("Telegram Web App ready");
-    } else {
-      console.log("Telegram Web App API tidak tersedia");
+      WebApp.ready();  // Inisialisasi WebApp hanya ketika konteks Telegram Web App tersedia
     }
   }, []);
-
 
   return (
     <WagmiProvider config={config}>

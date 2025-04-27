@@ -19,8 +19,6 @@ const Mining = () => {
     }
   }, []);
 
-
-
   return (
     <div>
     <div className="flex mt-2 justify-between items-center text-black border border-gray-500 p-2 rounded-xl mx-2">
