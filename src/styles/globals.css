@@ -112,3 +112,27 @@ button:focus-visible {
     transform: rotate(1turn);
   }
 }
+
+/* Menyusun container untuk titik */
+.blinking-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  animation: pulse 1.5s infinite; /* Efek pulse akan berjalan terus menerus */
+}
+
+/* Animasi pulse */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

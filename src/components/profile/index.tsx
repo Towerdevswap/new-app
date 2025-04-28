@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 
 type Post = {
@@ -30,7 +30,23 @@ const mockUser = {
 
 const Profile = () => {
   const router = useRouter();
+  const [username, setUsername] = useState<string | null>(null);
   const [tab, setTab] = useState<"activity" | "post">("activity");
+
+  useEffect(() => {
+    import('@twa-dev/sdk').then((WebAppModule) => {
+      const WebApp = WebAppModule.default;
+      if (WebApp && WebApp.initDataUnsafe) {
+        const userData = WebApp.initDataUnsafe.user;
+        if (userData && userData.username) { // ✅ bener
+          setUsername(userData.username || null);
+        }
+      }
+    }).catch((error) => {
+      console.error("Error loading WebApp module:", error);
+    });
+  }, []);
+
 
   return (
     <div className="p-4 max-w-md mx-auto bg-white shadow rounded-lg">
@@ -41,7 +57,7 @@ const Profile = () => {
           alt="Profile"
           className="w-24 h-24 rounded-full shadow"
         />
-        <h2 className="text-lg font-bold">{mockUser.username}</h2>
+        <h2 className="text-lg font-bold">{username || mockUser.username}</h2>
         <div className="flex space-x-6 text-sm text-gray-600">
           <div>
             <span className="font-bold text-black">{mockUser.followers}</span> Followers
@@ -53,11 +69,10 @@ const Profile = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex justify-between mt-6 mb-2 border-b">
-      <div>
+      <div className="flex justify-around mt-6 mb-2 border-b">
         <button
           onClick={() => setTab("activity")}
-          className={`py-1 px-4 font-medium ${
+          className={`flex bg-[#df92fb] rounded-full items-center text-sm px-4 py-1 ${
             tab === "activity" ? "border-b-2 border-blue-500 text-blue-600" : "text-gray-500"
           }`}
         >
@@ -65,18 +80,17 @@ const Profile = () => {
         </button>
         <button
           onClick={() => setTab("post")}
-          className={`py-1 px-4 font-medium ${
+          className={`flex bg-[#8afdff] rounded-full items-center text-sm px-4 py-1 ${
             tab === "post" ? "border-b-2 border-blue-500 text-blue-600" : "text-gray-500"
           }`}
         >
           Posts
         </button>
-        </div>
         <button
         onClick={() => router.push("/portfolio")}
-          className="py-1 px-4 flex bg-yellow-300 rounded-xl items-center text-sm"
+          className="flex bg-yellow-300 rounded-full items-center text-sm px-4 py-1"
         >
-          <img src="/images/wallet2.svg" className="h-6 w-6 items-center mr-2" alt="Wallet" />Portfolio
+          <img src="/images/wallet2.svg" className="h-8 w-8 items-center bg-yellow-100 rounded-full" alt="Wallet" />Portfolio
         </button>
       </div>
 

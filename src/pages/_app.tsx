@@ -4,7 +4,7 @@ import { WagmiProvider, createConfig, http } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { base } from 'wagmi/chains';
 import { injected } from 'wagmi/connectors';
-import Navbar from "../components/menu/Navbar";
+// import Navbar from "../components/menu/Navbar";
 import BottomMenu from "../components/menu/BottomMenu";
 import "../styles/globals.css";
 
@@ -36,7 +36,7 @@ function MyApp({ Component, pageProps }: AppProps) {
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
         <div>
-          <Navbar />
+          {/* <Navbar /> */}
           <div className="pt-2 pb-20">
             <Component {...pageProps} />
           </div>

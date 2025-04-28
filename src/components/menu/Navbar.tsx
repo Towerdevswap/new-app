@@ -18,8 +18,8 @@ const Navbar = () => {
   };
 
   return (
-    <div className="flex justify-between bg-white border-b-2 items-center px-2 py-2 border-b shadow-sm">
-      <div className="font-bold text-2xl text-black">🪙 BitBase</div>
+    <div className="flex justify-between bg-white border-b-2 items-center px-2  border-b shadow-sm">
+      <p className="flex items-center text-xl font-bold space-x-2"><img src="/images/logo.png" className="w-10 h-10 mr-2" /> BitBase </p>
 
       <button
         onClick={handleWalletClick}

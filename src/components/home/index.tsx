@@ -5,7 +5,6 @@ const Mining = () => {
   const router = useRouter();
   // State untuk menyimpan data pengguna
   const [username, setUsername] = useState<string | null>(null);
-  const [profilePic, setProfilePic] = useState<string | null>(null);
   const [balance] = useState<number>(200.00); // Mocked balance
 
   useEffect(() => {
@@ -14,10 +13,8 @@ const Mining = () => {
       const WebApp = WebAppModule.default; // Memastikan menggunakan WebApp dari SDK
       if (WebApp && WebApp.initDataUnsafe) {
         const userData = WebApp.initDataUnsafe.user;
-        if (userData && userData.username) {
-          setUsername(userData.username);
-          console.log('Username:', userData.username);
-          setProfilePic(userData.photo_url || null);
+        if (userData && userData.username) { // <- sudah bener sekarang
+          setUsername(userData.username || null);
         }
       }
     }).catch((error) => {
@@ -26,18 +23,19 @@ const Mining = () => {
   }, []);
 
 
+
   return (
     <div className="text-black">
       <div className="flex mt-2 justify-between items-center border-gray-600 border px-4 py-2 rounded-xl mx-2">
         <div className="flex items-center">
           <img
-            src={profilePic || "/images/avatar-placeholder.jpg"} // Menampilkan foto profil atau gambar placeholder
+            src="/images/avatar-placeholder.jpg"// Menampilkan foto profil atau gambar placeholder
             className="h-10 w-10 rounded-full mr-2"
             alt="Profile"
           />
           <div>
             <p className="text-xl">{username || "Username"}</p> {/* Menampilkan username */}
-            <p className="text-sm">🪙 {balance} BB</p> {/* Menampilkan saldo */}
+            <p className="text-sm flex items-center"><img src="/images/logo.png" className="h-4 w-4 mr-1" />{balance} BB</p> {/* Menampilkan saldo */}
           </div>
         </div>
         <button
@@ -69,36 +67,38 @@ const Mining = () => {
       {/* Featured Options */}
       <div className="flex justify-around text-sm text-center pt-4 pb-2">
         {[
-          { label: "Premium", image: "premium.svg" },
-          { label: "Launchpad", image: "rocket.svg" },
-          { label: "SocialFi", image: "feed.svg" },
-          { label: "Staking", image: "earn.svg" },
-        ].map(({ label, image }, i) => (
+          { label: "Premium", image: "premium.svg", dot: "🟡", route: "/" },
+          { label: "Launchpad", image: "rocket.svg", dot: "🟡", route: "/" },
+          { label: "SocialFi", image: "feed.svg", dot: "🟢", route: "/explore" },
+          { label: "Staking", image: "earn.svg", dot: "🟡", route: "/" },
+        ].map(({ label, image, dot, route }, i) => (
           <div key={i} className="flex flex-col items-center space-y-1">
             <img
               src={`/images/${image}`}
+              onClick={() => router.push(route)}
               className="h-8 w-8"
               alt={label}
             />
-            <span>{label}</span>
+            <p>{label}<span className="blinking-dot text-[8px]">{dot}</span></p>
           </div>
         ))}
       </div>
 
       <div className="flex justify-around text-sm text-center py-2">
         {[
-          { label: "Referral", image: "referral.svg" },
-          { label: "Revenue", image: "revenue.svg" },
-          { label: "Boost", image: "boost.svg" },
-          { label: "Games", image: "games.svg" },
-        ].map(({ label, image }, i) => (
+          { label: "Referral", image: "referral.svg", dot: "🟢", route: "/invite"  },
+          { label: "Revenue", image: "revenue.svg", dot: "🟡", route: "/" },
+          { label: "Boost", image: "boost.svg", dot: "🟢", route: "/" },
+          { label: "Games", image: "games.svg", dot: "🔴", route: "/" },
+        ].map(({ label, image, dot, route }, i) => (
           <div key={i} className="flex flex-col items-center space-y-1">
             <img
               src={`/images/${image}`}
+              onClick={() => router.push(route)}
               className="h-8 w-8 "
               alt={label}
             />
-            <span>{label}</span>
+            <p>{label}<span className="blinking-dot text-[8px]">{dot}</span></p>
           </div>
         ))}
       </div>
@@ -107,7 +107,7 @@ const Mining = () => {
       <div className="px-4 py-2 mt-4 bg-gray-200 border rounded-xl mx-2">
         <p>Join Community</p>
       </div>
-      <div className="flex justify-around text-sm text-center py-4 mb-12">
+      <div className="flex justify-around text-sm text-center pt-4 ">
         {[
           { label: "Telegram", image: "telegram.svg" },
           { label: "Twitter", image: "twitter.svg" },
@@ -123,6 +123,10 @@ const Mining = () => {
             <span>{label}</span>
           </div>
         ))}
+      </div>
+
+      <div className="px-4 py-2 mt-4 bg-gray-200 border rounded-xl mx-2">
+        <p>Partners</p>
       </div>
 
     </div>
