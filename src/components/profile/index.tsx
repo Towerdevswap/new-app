@@ -14,6 +14,7 @@ type Activity = {
 
 const mockUser = {
   image: "https://i.pravatar.cc/150?img=5",
+  firstname: "Alexcccccc",
   username: "@bullpad_user",
   followers: 120,
   following: 88,
@@ -29,6 +30,7 @@ const mockUser = {
 
 const Profile = () => {
   const [username, setUsername] = useState<string | null>(null);
+  const [firstname, setFirstname] = useState<string | null>(null);
   const [tab, setTab] = useState<"activity" | "post">("activity");
 
   useEffect(() => {
@@ -36,8 +38,9 @@ const Profile = () => {
       const WebApp = WebAppModule.default;
       if (WebApp && WebApp.initDataUnsafe) {
         const userData = WebApp.initDataUnsafe.user;
-        if (userData && userData.username) {
+        if (userData && userData.username && userData.first_name) {
           setUsername(userData.username || null);
+          setFirstname(userData.first_name || null);
         }
       }
     }).catch((error) => {
@@ -65,9 +68,10 @@ const Profile = () => {
       </div>
 
       {/* Space bawah untuk profil */}
-      <div className="mt-12 flex flex-col items-center space-y-2">
-        <h2 className="text-lg font-bold">{username || mockUser.username}</h2>
-        <div className="flex space-x-6 text-sm text-gray-600">
+      <div className="mt-12 flex flex-col items-center ">
+        <h2 className="text-lg font-bold">{firstname || mockUser.firstname}</h2>
+        <p className="text-sm mb-2 -mt-1">{username || mockUser.username}</p>
+        <div className="flex space-x-6 text-sm text-gray-600 ">
           <div>
             <span className="font-bold text-black">{mockUser.followers}</span> Followers
           </div>

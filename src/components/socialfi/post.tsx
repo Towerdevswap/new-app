@@ -24,9 +24,10 @@ const Post = ({ image, username, content, date, likeCount, commentCount, shareCo
 
         {/* Count Section */}
         <div className="flex justify-between items-center mt-4 text-sm text-gray-500">
-          <div className="flex gap-1"><img src="/images/like.svg" className="w-5 h-5" /> {likeCount} likes</div>
-          <div className="flex gap-1"><img src="/images/comment.svg" className="w-6 h-6" /> {commentCount} comments</div>
-          <div className="flex gap-1"><img src="/images/share.svg" className="w-5 h-5" /> {shareCount} share</div>
+          <div className="flex gap-1 items-center"><img src="/images/like.svg" className="w-5 h-5" /> {likeCount}</div>
+          <div className="flex gap-1 items-center"><img src="/images/comment.svg" className="w-6 h-6" /> {commentCount}</div>
+          <div className="flex gap-1 items-center"><img src="/images/logo.png" className="w-4 h-4" /> {commentCount}</div>
+          <div className="flex gap-1 items-center"><img src="/images/share.svg" className="w-5 h-5" /> {shareCount}</div>
         </div>
 
       </div>
