@@ -53,7 +53,7 @@ const Mining = () => {
         </p>
         <button
         onClick={() => router.push("/dailyclaim")}
-        className="text-lg text-black bg-yellow-500 py-2 px-4 rounded-2xl shadow">
+        className="text-lg text-black bg-yellow-500 py-2 px-4 rounded-3xl shadow">
           Daily Bonus
         </button>
       </div>
@@ -87,9 +87,9 @@ const Mining = () => {
       <div className="flex justify-around text-sm text-center py-2">
         {[
           { label: "Referral", image: "referral.svg", dot: "🟢", route: "/invite"  },
-          { label: "Revenue", image: "revenue.svg", dot: "🟡", route: "/" },
+          { label: "Rewards", image: "revenue.svg", dot: "🟢", route: "/portfolio" },
           { label: "Boost", image: "boost.svg", dot: "🟢", route: "/" },
-          { label: "Games", image: "games.svg", dot: "🔴", route: "/" },
+          { label: "Wallet", image: "wallet2.svg", dot: "🟢", route: "/" },
         ].map(({ label, image, dot, route }, i) => (
           <div key={i} className="flex flex-col items-center space-y-1">
             <img

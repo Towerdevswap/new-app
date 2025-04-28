@@ -37,7 +37,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       <QueryClientProvider client={queryClient}>
         <div>
           {/* <Navbar /> */}
-          <div className="pt-2 pb-20">
+          <div className="pb-20">
             <Component {...pageProps} />
           </div>
           <BottomMenu />

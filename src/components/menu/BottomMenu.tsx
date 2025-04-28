@@ -1,7 +1,8 @@
 import { useRouter } from "next/router";
-import { FaTasks, FaUserFriends } from "react-icons/fa";
+import { FaTasks } from "react-icons/fa";
 import { GoHome } from "react-icons/go";
 import { MdOutlineExplore } from "react-icons/md";
+import { CgProfile } from "react-icons/cg";
 import { GiMining } from "react-icons/gi";
 import MenuButton from "./MenuButton";
 
@@ -42,10 +43,10 @@ const BottomMenu = () => {
           onClick={() => router.push("/tasks")}
         />
         <MenuButton
-          icon={<FaUserFriends />}
-          label="Invite"
-          active={current === "invite"}
-          onClick={() => router.push("/invite")}
+          icon={<CgProfile />}
+          label="Profile"
+          active={current === "profile"}
+          onClick={() => router.push("/profile")}
         />
       </div>
     </div>

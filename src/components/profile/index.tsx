@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useRouter } from "next/router";
 
 type Post = {
   id: number;
@@ -29,7 +28,6 @@ const mockUser = {
 };
 
 const Profile = () => {
-  const router = useRouter();
   const [username, setUsername] = useState<string | null>(null);
   const [tab, setTab] = useState<"activity" | "post">("activity");
 
@@ -38,7 +36,7 @@ const Profile = () => {
       const WebApp = WebAppModule.default;
       if (WebApp && WebApp.initDataUnsafe) {
         const userData = WebApp.initDataUnsafe.user;
-        if (userData && userData.username) { // ✅ bener
+        if (userData && userData.username) {
           setUsername(userData.username || null);
         }
       }
@@ -47,16 +45,27 @@ const Profile = () => {
     });
   }, []);
 
-
   return (
-    <div className="p-4 max-w-md mx-auto bg-white shadow rounded-lg">
-      {/* Profile Header */}
-      <div className="flex flex-col items-center space-y-2">
+    <div className="pb-4 bg-white rounded-lg">
+      {/* Banner */}
+      <div className="relative">
         <img
-          src={mockUser.image}
-          alt="Profile"
-          className="w-24 h-24 rounded-full shadow"
+          src={mockUser.image} // Ganti dengan URL banner kamu
+          alt="Banner"
+          className="w-full h-28 object-cover rounded-t-lg"
         />
+        {/* Profile Image */}
+        <div className="absolute left-1/2 transform -translate-x-1/2 -bottom-12">
+          <img
+            src={mockUser.image}
+            alt="Profile"
+            className="w-24 h-24 rounded-full border-4 border-white shadow"
+          />
+        </div>
+      </div>
+
+      {/* Space bawah untuk profil */}
+      <div className="mt-12 flex flex-col items-center space-y-2">
         <h2 className="text-lg font-bold">{username || mockUser.username}</h2>
         <div className="flex space-x-6 text-sm text-gray-600">
           <div>
@@ -69,33 +78,29 @@ const Profile = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex justify-around mt-6 mb-2 border-b">
+      <div className="flex justify-center gap-4 mt-6 mb-2">
         <button
           onClick={() => setTab("activity")}
-          className={`flex bg-[#df92fb] rounded-full items-center text-sm px-4 py-1 ${
+          className={`flex rounded-full items-center text-sm px-4 py-1 ${
             tab === "activity" ? "border-b-2 border-blue-500 text-blue-600" : "text-gray-500"
           }`}
         >
+        <img src="/images/activity.svg" className="w-5 h-5 mr-1" />
           Activity
         </button>
         <button
           onClick={() => setTab("post")}
-          className={`flex bg-[#8afdff] rounded-full items-center text-sm px-4 py-1 ${
+          className={`flex rounded-full items-center text-sm px-4 py-1 ${
             tab === "post" ? "border-b-2 border-blue-500 text-blue-600" : "text-gray-500"
           }`}
         >
+        <img src="/images/feed2.svg" className="w-5 h-5 mr-1" />
           Posts
-        </button>
-        <button
-        onClick={() => router.push("/portfolio")}
-          className="flex bg-yellow-300 rounded-full items-center text-sm px-4 py-1"
-        >
-          <img src="/images/wallet2.svg" className="h-8 w-8 items-center bg-yellow-100 rounded-full" alt="Wallet" />Portfolio
         </button>
       </div>
 
       {/* Content */}
-      <div className="mt-4 space-y-4">
+      <div className="mt-4 space-y-4 pb-20 px-4 border-t-2 border-blue-200 pt-4 rounded-2xl">
         {tab === "activity" ? (
           mockUser.activities.length > 0 ? (
             mockUser.activities.map((activity) => (

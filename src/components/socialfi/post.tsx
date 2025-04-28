@@ -13,9 +13,12 @@ const Post = ({ image, username, content, date, likeCount, commentCount, shareCo
     <div className="flex gap-2 border-b p-4">
       <img src={image} className="w-8 h-8 rounded-full" />
       <div className="flex-1 mb-2">
+      <div className="flex justify-between">
         <div className="mb-2">
           <h3 className="text-xl font-bold">{username}</h3>
           <p className="text-xs text-gray-400 -mt-1">{date}</p>
+        </div>
+        <img src="/images/option.svg" className="h-8 w-8 bg-gray-100 p-1 rounded-lg"/>
         </div>
         <p className="text-gray-700">{content}</p>
 
