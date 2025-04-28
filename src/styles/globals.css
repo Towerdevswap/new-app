@@ -136,3 +136,11 @@ button:focus-visible {
     opacity: 1;
   }
 }
+
+.card-bg {
+ background: radial-gradient(circle, #50cdf7 25%, #2445a8 100%);/* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
+
+.card-bg2 {
+  background: radial-gradient(circle, #da51f7 25%, #2445a8 100%);
+}

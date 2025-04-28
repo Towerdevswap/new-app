@@ -13,8 +13,8 @@ const Mining = () => {
       const WebApp = WebAppModule.default; // Memastikan menggunakan WebApp dari SDK
       if (WebApp && WebApp.initDataUnsafe) {
         const userData = WebApp.initDataUnsafe.user;
-        if (userData && userData.username) { // <- sudah bener sekarang
-          setUsername(userData.username || null);
+        if (userData && userData.first_name) { // <- sudah bener sekarang
+          setUsername(userData.first_name || null);
         }
       }
     }).catch((error) => {
