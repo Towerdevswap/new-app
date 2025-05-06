@@ -19,7 +19,7 @@ const Navbar = () => {
 
   return (
     <div className="flex justify-between bg-white border-b-2 items-center px-2  border-b shadow-sm">
-      <p className="flex items-center text-xl font-bold space-x-2"><img src="/images/logo.png" className="w-10 h-10 mr-2" /> BitBase </p>
+      <p className="flex items-center text-xl font-bold space-x-2"><img src="/images/logo.png" className="w-10 h-10 mr-2" /> BitMon </p>
 
       <button
         onClick={handleWalletClick}

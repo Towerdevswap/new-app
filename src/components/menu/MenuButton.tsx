@@ -12,14 +12,14 @@ const MenuButton: React.FC<MenuButtonProps> = ({ icon, label, active, onClick, c
   return (
     <button
       onClick={onClick}
-      className={`flex flex-col items-center justify-center p-1 rounded-lg ${
-        active ? "text-black bg-transparent border-none" : "text-gray-500 bg-transparent"
-      } ${className}`} // ✅ tambahkan ini agar styling dari luar bisa masuk
+      className={`flex flex-col items-center justify-center p-2 transition-all duration-300 ${
+        active ? "text-black" : "text-gray-500"
+      } ${className}`}
     >
-      <div className={`text-2xl bg-transparent border-none ${active ? "text-black" : "text-gray-500"}`}>
+      <div className={`text-2xl ${active ? "text-black" : "text-gray-500"}`}>
         {icon}
       </div>
-      <div className="text-xs">{label}</div>
+      <div className="text-xs mt-1">{label}</div>
     </button>
   );
 };

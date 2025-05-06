@@ -1,42 +1,62 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { FaCopy, FaUserFriends, FaGift } from "react-icons/fa";
+import { id } from "../../utils/telegram";
+import API_URL from '../../config/apiUrl';
+import { FaCopy, FaUserFriends, FaGift, FaHistory } from "react-icons/fa";
 
-const mockUserId = "123456789";
-const BASE_URL = "https://t.me/your_bot?start=";
+interface Referral {
+  id: string;
+  status: 'active' | 'inactive' | 'pending'; // adjust based on your actual status values
+  referee: {
+    username?: string;
+    firstname: string;
+  };
+  rewardEarned: number;
+}
 
 const Invite = () => {
   const router = useRouter();
+  const [referralData, setReferralData] = useState<{
+    count: number;
+    totalReward: number;
+    referrals: Referral[];
+    dailyEarnings: number;
+  }>({
+    count: 0,
+    totalReward: 0,
+    referrals: [],
+    dailyEarnings: 0
+  });
+  const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
-  const [successCount, setSuccessCount] = useState<number | null>(null);
-  const [inviteList, setInviteList] = useState<
-    { username: string; reward: string }[]
-  >([]);
+  const userId = id;
 
-  const referralLink = `${BASE_URL}${mockUserId}`;
+  const referralLink = `https://t.me/bitMon_bot?start=${userId}`;
 
   useEffect(() => {
-    // Simulasi fetch data dari backend
-    const fetchData = async () => {
+    const fetchReferralData = async () => {
       try {
-        // Simulasi count
-        setTimeout(() => {
-          setSuccessCount(3);
-          setInviteList([
-            { username: "alice", reward: "+1 hash" },
-            { username: "bob", reward: "+1 hash" },
-            { username: "charlie", reward: "+1 hash" },
-          ]);
-        }, 500);
+        const res = await fetch(`${API_URL}/referrals/${userId}`);
+        const data = await res.json();
+
+        // Calculate daily earnings from active referrals
+        const daily = data.referrals
+          .filter((r: Referral) => r.status === 'active')
+          .length * 0.1;
+
+        setReferralData({
+          ...data,
+          dailyEarnings: daily
+        });
       } catch (err) {
-        console.error("Failed to fetch invite data", err);
-        setSuccessCount(0);
-        setInviteList([]);
+        console.error("Failed to fetch referrals", err);
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchData();
-  }, []);
+    fetchReferralData();
+  }, [userId]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(referralLink);
@@ -45,82 +65,109 @@ const Invite = () => {
   };
 
   return (
-    <div className="p-4 bg-white rounded shadow">
+    <div className="p-4">
     <div onClick={() => router.push("/")} className="pb-4 flex space-x-2 items-center">
       <img src="/images/arrowback.svg" className="w-4 h-4" />
       <p className="text-lg"> Back </p>
     </div>
-    <div className="flex card-bg2 justify-around items-center border py-2 rounded-xl mb-4 ">
-     <div className="pl-4">
-     <h1 className="text-xl text-white font-bold">Invite Friens</h1>
-     <p className="text-xs text-white ">Copy and share your referral link to earn more BB</p>
-     </div>
-     <img
-     src="https://static.vecteezy.com/system/resources/thumbnails/008/486/043/small/open-gift-box-surprise-earn-point-and-get-rewards-special-offer-concept-3d-rendering-illustration-png.png"
-     className="w-32 h-32" />
-    </div>
-
-    <div className="flex justify-between mb-4">
-      <div className="bg-gray-200 px-4 py-2 rounded-xl flex items-center justify-between">
-      <span
-        onClick={() => {
-          navigator.clipboard.writeText(referralLink);
-          alert("Link copied!");
-        }}
-        className="text-lg font-bold text-center text-black cursor-pointer "
-      >
-        Invite Friens
-      </span>
-
-        <button
-          onClick={handleCopy}
-          className="text-blue-600 hover:text-blue-800 ml-2"
-        >
-          <FaCopy />
-        </button>
+      <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-4 rounded-lg text-white mb-6">
+        <h2 className="text-xl font-bold mb-2">Your Referral Link</h2>
+        <div className="flex items-center">
+          <input
+            type="text"
+            readOnly
+            value={referralLink}
+            className="flex-1 bg-white bg-opacity-20 rounded-l-lg p-2 text-sm truncate"
+          />
+          <button
+            onClick={handleCopy}
+            className="bg-white text-blue-600 p-2 rounded-r-lg hover:bg-gray-100"
+          >
+            {copied ? 'Copied!' : <FaCopy />}
+          </button>
+        </div>
       </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-2 gap-4 mb-4">
+        <div className="bg-white p-4 rounded-lg shadow">
+          <div className="flex items-center text-gray-500">
+            <FaUserFriends className="mr-2" />
+            <span className="text-sm">Referrals</span>
+          </div>
+          <p className="text-xl font-bold mt-1">
+            {loading ? '--' : referralData.count}
+          </p>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow">
+          <div className="flex items-center text-gray-500">
+            <FaGift className="mr-2" />
+            <span className="text-sm">Total Earnings</span>
+          </div>
+          <p className="text-xl font-bold mt-1">
+            {loading ? '--' : referralData.totalReward.toFixed(2)} BB
+          </p>
+        </div>
+      </div>
+
       <button
-      onClick={() => router.push("/leaderboard")}
-      className="text-sm font-bold  px-4 py-1 bg-yellow-300 border-blue-200 rounded-xl"
+        onClick={() => router.push("/leaderboard")}
+        className="w-full mb-4 text-lg font-bold px-4 py-2 bg-yellow-300 border-blue-200 rounded-xl"
       >
-      Leaderboard
+        Leaderboard
       </button>
-      </div>
 
-      {copied && <p className="text-green-600 text-sm">Link copied!</p>}
-
-      <div className="mt-2 text-center items-center border-gray-600 border px-4 py-2 rounded-xl">
-      <p className="text-xs text-black ">Received rewards from friens</p>
-      <h1 className="flex justify-center items-center text-xl text-black font-bold"><img src="/images/logo.png" className="h-6 w-6 mr-1" />1,020 BB</h1>
-      </div>
-
-      <div className="flex items-center space-x-2 text-gray-700 mt-4">
-        <FaUserFriends className="text-lg" />
-        <p className="text-sm">
-          Successful Invites:{" "}
-          <span className="font-semibold text-black">
-            {successCount !== null ? successCount : "Loading..."}
-          </span>
+      {/* Daily Earnings */}
+      <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg mb-6">
+        <div className="flex items-center text-yellow-800">
+          <FaHistory className="mr-2" />
+          <span className="font-medium">Daily Earnings</span>
+        </div>
+        <p className="text-lg mt-1">
+          +{loading ? '--' : referralData.dailyEarnings.toFixed(2)} BB/day
+        </p>
+        <p className="text-sm text-yellow-600 mt-1">
+          Earn 0.1 BB daily for each active referral
         </p>
       </div>
 
-      {inviteList.length > 0 && (
-        <div className="pt-4 border-t border-gray-200">
-          <ul className="space-y-1">
-            {inviteList.map((invite, index) => (
-              <li
-                key={index}
-                className="text-lg border p-2 rounded-xl flex items-center justify-between text-sm text-gray-800"
-              >
-                <span className="text-lg">{invite.username}</span>
-                <span className="text-green-600 flex items-center gap-1">
-                  <FaGift className="text-lg" /> {invite.reward}
-                </span>
-              </li>
+      {/* Referrals List */}
+      <div className="bg-white p-4 rounded-lg shadow">
+        <h3 className="font-bold text-lg mb-3">Your Referrals</h3>
+
+        {loading ? (
+          <p>Loading referrals...</p>
+        ) : referralData.referrals.length === 0 ? (
+          <p className="text-gray-500">No referrals yet</p>
+        ) : (
+          <div className="space-y-3">
+            {referralData.referrals.map((referral) => (
+              <div key={referral.id} className="flex items-center justify-between p-3 border rounded-lg">
+                <div>
+                  <p className="font-medium">
+                    {referral.referee.username || referral.referee.firstname}
+                  </p>
+                  <p className={`text-xs ${
+                    referral.status === 'active' ? 'text-green-600' : 'text-gray-500'
+                  }`}>
+                    {referral.status.toUpperCase()}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="font-bold text-green-600">
+                    +{referral.rewardEarned.toFixed(2)} BB
+                  </p>
+                  {referral.status === 'active' && (
+                    <p className="text-xs text-gray-500">
+                      +0.1 BB daily
+                    </p>
+                  )}
+                </div>
+              </div>
             ))}
-          </ul>
-        </div>
-      )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

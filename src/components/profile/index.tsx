@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { id } from '../../utils/telegram';
+import API_URL from '../../config/apiUrl';
 
 type Post = {
   id: number;
@@ -29,31 +31,42 @@ const mockUser = {
 };
 
 const Profile = () => {
-  const [username, setUsername] = useState<string | null>(null);
-  const [firstname, setFirstname] = useState<string | null>(null);
   const [tab, setTab] = useState<"activity" | "post">("activity");
 
   useEffect(() => {
-    import('@twa-dev/sdk').then((WebAppModule) => {
-      const WebApp = WebAppModule.default;
-      if (WebApp && WebApp.initDataUnsafe) {
-        const userData = WebApp.initDataUnsafe.user;
-        if (userData && userData.username && userData.first_name) {
-          setUsername(userData.username || null);
-          setFirstname(userData.first_name || null);
-        }
-      }
-    }).catch((error) => {
-      console.error("Error loading WebApp module:", error);
-    });
-  }, []);
+    // Only use the id from telegram utils since username and firstname aren't used
+    if (id) {
+      // Kirim data ke backend untuk disimpan
+      fetch(`${API_URL}/profiles/create`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          telegramId: id,
+          username: mockUser.username, // Using mock data instead
+          firstname: mockUser.firstname, // Using mock data instead
+          image: mockUser.image,
+          followers: mockUser.followers,
+          following: mockUser.following,
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("Profile saved:", data);
+        })
+        .catch((error) => {
+          console.error("Error saving profile:", error);
+        });
+    }
+  }, [id]); // Only include id in dependencies since it's the only one used
 
   return (
     <div className="pb-4 bg-white rounded-lg">
       {/* Banner */}
       <div className="relative">
         <img
-          src={mockUser.image} // Ganti dengan URL banner kamu
+          src={mockUser.image}
           alt="Banner"
           className="w-full h-28 object-cover rounded-t-lg"
         />
@@ -69,8 +82,8 @@ const Profile = () => {
 
       {/* Space bawah untuk profil */}
       <div className="mt-12 flex flex-col items-center ">
-        <h2 className="text-lg font-bold">{firstname || mockUser.firstname}</h2>
-        <p className="text-sm mb-2 -mt-1">{username || mockUser.username}</p>
+        <h2 className="text-lg font-bold">{mockUser.firstname}</h2>
+        <p className="text-sm mb-2 -mt-1">{mockUser.username}</p>
         <div className="flex space-x-6 text-sm text-gray-600 ">
           <div>
             <span className="font-bold text-black">{mockUser.followers}</span> Followers
@@ -89,7 +102,7 @@ const Profile = () => {
             tab === "activity" ? "border-b-2 border-blue-500 text-blue-600" : "text-gray-500"
           }`}
         >
-        <img src="/images/activity.svg" className="w-5 h-5 mr-1" />
+          <img src="/images/activity.svg" className="w-5 h-5 mr-1" />
           Activity
         </button>
         <button
@@ -98,7 +111,7 @@ const Profile = () => {
             tab === "post" ? "border-b-2 border-blue-500 text-blue-600" : "text-gray-500"
           }`}
         >
-        <img src="/images/feed2.svg" className="w-5 h-5 mr-1" />
+          <img src="/images/feed2.svg" className="w-5 h-5 mr-1" />
           Posts
         </button>
       </div>

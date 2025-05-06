@@ -49,12 +49,12 @@ const Mining = () => {
       {/* Start Mining Button */}
       <div className="flex justify-between items-center text-center border-4 border-gray-700 bg-black rounded-3xl mt-4 mx-2">
         <p className="text-lg text-white py-2 px-4">
-          Streak: Day 2
+          🎁+10 Hash
         </p>
         <button
         onClick={() => router.push("/dailyclaim")}
         className="text-lg text-black bg-yellow-500 py-2 px-4 rounded-3xl shadow">
-          Daily Bonus
+          Claim Daily Bonus
         </button>
       </div>
 

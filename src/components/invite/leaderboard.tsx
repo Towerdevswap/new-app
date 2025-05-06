@@ -1,89 +1,153 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { id } from "../../utils/telegram";
+import API_URL from '../../config/apiUrl';
 
-type User = {
+type LeaderboardItem = {
   rank: number;
+  firstname: string;
   username: string;
-  rewards: number; // dalam BB
+  reward?: number;
+  invited?: number;
 };
-
-const dummyData: User[] = [
-  { rank: 1, username: "KingBull", rewards: 1200 },
-  { rank: 2, username: "CryptoQueen", rewards: 950 },
-  { rank: 3, username: "BullMaster", rewards: 850 },
-  { rank: 4, username: "FastTrader", rewards: 800 },
-  { rank: 5, username: "LuckyBull", rewards: 750 },
-];
 
 const LeaderboardPage = () => {
   const router = useRouter();
-  const [username, setUsername] = useState<string | null>(null);
-  const [users, setUsers] = useState<User[]>([]);
+  const [activeTab, setActiveTab] = useState<'bonus' | 'invited'>('bonus');
+  const [leaderboard, setLeaderboard] = useState<LeaderboardItem[]>([]);
+  const [userPosition, setUserPosition] = useState({
+    bonus: { rank: 0, reward: 0 },
+    invited: { rank: 0, count: 0 }
+  });
+  const [loading, setLoading] = useState(true);
+  const userId = id; // Ganti dengan ID user sebenarnya
 
   useEffect(() => {
-    // Langsung mengimpor WebApp dari @twa-dev/sdk tanpa menggunakan dynamic
-    import('@twa-dev/sdk').then((WebAppModule) => {
-      const WebApp = WebAppModule.default; // Memastikan menggunakan WebApp dari SDK
-      if (WebApp && WebApp.initDataUnsafe) {
-        const userData = WebApp.initDataUnsafe.user;
-        if (userData && userData.first_name) { // <- sudah bener sekarang
-          setUsername(userData.first_name || null);
-        }
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+
+        // Fetch leaderboard based on active tab
+        const res = await fetch(`${API_URL}/leaderboard/by-${activeTab}`);
+        const data = await res.json();
+        setLeaderboard(data.leaderboard);
+
+        // Fetch user position
+        const posRes = await fetch(`${API_URL}/leaderboard/user-position/${userId}`);
+        const posData = await posRes.json();
+        setUserPosition(posData.data);
+
+      } catch (error) {
+        console.error("Failed to fetch leaderboard:", error);
+      } finally {
+        setLoading(false);
       }
-    }).catch((error) => {
-      console.error("Error loading WebApp module:", error);
-    });
-  }, []);
+    };
 
-  useEffect(() => {
-    // Simulasi fetching data
-    setTimeout(() => {
-      setUsers(dummyData);
-    }, 500);
-  }, []);
+    fetchData();
+  }, [activeTab, userId]);
 
   return (
-    <div className="min-h-screen bg-white p-2">
-    <div onClick={() => router.push("/invite")} className="pb-4 flex space-x-2 pt-2 items-center">
-      <img src="/images/arrowback.svg" className="w-4 h-4" />
-      <p className="text-lg"> Back </p>
-    </div>
-     <div className="flex card-bg justify-around items-center border py-4 rounded-xl mb-4 ">
-      <h1 className="text-xl text-white font-bold">Leaderboard</h1>
-      <img
-      src="https://cdn3d.iconscout.com/3d/premium/thumb/winner-podium-3d-icon-download-in-png-blend-fbx-gltf-file-formats--leaderboard-champion-stage-festival-pack-days-icons-5805516.png?f=webp"
-      className="w-40 h-24" />
-     </div>
+    <div className="min-h-screen bg-white p-4">
+      <div className="flex justify-between items-center mb-6">
+        <button
+          onClick={() => router.back()}
+          className="flex items-center text-gray-600"
+        >
+          <img src="/images/arrowback.svg" className="w-4 h-4 mr-1" />
+          Back
+        </button>
 
-     <div className="flex my-2 justify-between items-center border-gray-600 border p-2 rounded-xl">
-       <div className="flex items-center">
-         <img
-           src="/images/avatar-placeholder.jpg"// Menampilkan foto profil atau gambar placeholder
-           className="h-10 w-10 rounded-full mr-2"
-           alt="Profile"
-         />
-         <div>
-           <p className="text-lg">{username || "Username"}</p> {/* Menampilkan username */}
-           <p className="text-sm flex items-center"><img src="/images/logo.png" className="h-4 w-4 mr-1" />0.100 $BB</p> {/* Menampilkan saldo */}
-         </div>
-       </div>
-       <p className="pr-2">
-        My Rank #120
-       </p>
-     </div>
+        <div className="flex space-x-2">
+          <button
+            onClick={() => setActiveTab('bonus')}
+            className={`px-4 py-2 rounded-lg ${
+              activeTab === 'bonus'
+                ? 'bg-blue-500 text-white'
+                : 'bg-gray-200 text-gray-700'
+            }`}
+          >
+            By Bonus
+          </button>
+          <button
+            onClick={() => setActiveTab('invited')}
+            className={`px-4 py-2 rounded-lg ${
+              activeTab === 'invited'
+                ? 'bg-blue-500 text-white'
+                : 'bg-gray-200 text-gray-700'
+            }`}
+          >
+            By Invited
+          </button>
+        </div>
+      </div>
 
-      <h1 className="text-lg mx-2"> Top Users </h1>
+      {/* User Position Card */}
+      <div className="bg-blue-50 p-4 rounded-lg mb-6 border border-blue-100">
+        <div className="flex justify-between">
+          <div>
+            <h3 className="font-medium">Your Position</h3>
+            <p className="text-sm text-gray-600">
+              {activeTab === 'bonus'
+                ? `Rank #${userPosition.bonus.rank}`
+                : `Rank #${userPosition.invited.rank}`}
+            </p>
+          </div>
+          <div className="text-right">
+            <p className="font-bold">
+              {activeTab === 'bonus'
+                ? `${userPosition.bonus.reward} BB`
+                : `${userPosition.invited.count} users`}
+            </p>
+          </div>
+        </div>
+      </div>
 
-      <div className="overflow-x-auto bg-white rounded-lg shadow-md">
-        <table className="min-w-full table-auto py-2">
-          <tbody className="text-gray-700 text-sm font-light">
-            {users.map((user) => (
-              <tr key={user.rank} className="border-b border-gray-200 hover:bg-gray-100">
-                <td className="py-3 pl-4">{user.rank}</td>
-                <td className="py-3 pr-4">@{user.username}</td>
-                <td className="py-3 px-4 text-end">{user.rewards} $BB</td>
+      {/* Leaderboard Table */}
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        <table className="min-w-full">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-4 py-3 text-left">Rank</th>
+              <th className="px-4 py-3 text-left">User</th>
+              <th className="px-4 py-3 text-right">
+                {activeTab === 'bonus' ? 'Reward (BB)' : 'Invited'}
+              </th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {loading ? (
+              <tr>
+                <td colSpan={3} className="px-4 py-6 text-center">
+                  Loading...
+                </td>
               </tr>
-            ))}
+            ) : leaderboard.length === 0 ? (
+              <tr>
+                <td colSpan={3} className="px-4 py-6 text-center">
+                  No data available
+                </td>
+              </tr>
+            ) : (
+              leaderboard.map((item) => (
+                <tr key={item.rank} className="hover:bg-gray-50">
+                  <td className="px-4 py-3">{item.rank}</td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center">
+                      <div className="ml-2">
+                        <p className="font-medium">{item.firstname}</p>
+                        <p className="text-sm text-gray-500">@{item.username}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 text-right font-bold">
+                    {activeTab === 'bonus'
+                      ? `${item.reward?.toFixed(2)} BB`
+                      : item.invited}
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

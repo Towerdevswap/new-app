@@ -30,12 +30,12 @@ const BottomMenu = () => {
           label="Mining"
           active={current === "mining"}
           onClick={() => router.push("/mining")}
-          className={`rounded-full p-2 ${
+          className={`rounded-2xl p-1 ${
             current === "mining"
-              ? "bg-gradient-to-br from-yellow-300 to-yellow-500 text-white shadow-lg scale-110"
+              ? "bg-gradient-to-br from-yellow-300 to-yellow-500 text-white shadow-2xl scale-110"
               : "bg-yellow-100 text-yellow-700"
           }`}
-        />
+         />
         <MenuButton
           icon={<FaTasks />}
           label="Tasks"

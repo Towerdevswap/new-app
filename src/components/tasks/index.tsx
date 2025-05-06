@@ -1,78 +1,105 @@
-import { useState } from "react";
-import { FaTwitter, FaTelegramPlane, FaCheckCircle } from "react-icons/fa";
+import { useState, useEffect } from "react";
+import { id } from "../../utils/telegram";
+import API_URL from '../../config/apiUrl';
+import { FaTwitter, FaTelegramPlane, FaCheckCircle, FaShieldAlt, FaWallet } from "react-icons/fa";
 import { TfiGift } from "react-icons/tfi";
+
+type TaskIcon = 'gift' | 'twitter' | 'telegram' | 'shield' | 'wallet';
 
 interface Task {
   id: string;
   label: string;
-  actionText: string;
-  reward: number; // hash rate
-  onClick: () => void;
+  reward: number;
   completed: boolean;
+  isDaily: boolean;
+  canClaimAfter?: string;
+  icon: TaskIcon;  // Changed from string to TaskIcon
+  url: string;
 }
 
 const Tasks = () => {
-  const [availableTasks, setAvailableTasks] = useState<Task[]>([
-    {
-      id: "daily",
-      label: "Daily Gift",
-      actionText: "Claim",
-      reward: 2,
-      completed: false,
-      onClick: () => window.open("https://twitter.com/your_project", "_blank"),
-    },
-    {
-      id: "follow-twitter",
-      label: "Follow us on Twitter",
-      actionText: "Follow",
-      reward: 10,
-      completed: false,
-      onClick: () => window.open("https://twitter.com/your_project", "_blank"),
-    },
-    {
-      id: "join-telegram",
-      label: "Join our Telegram",
-      actionText: "Join",
-      reward: 15,
-      completed: false,
-      onClick: () => window.open("https://t.me/your_project", "_blank"),
-    },
-    {
-      id: "anti-bot",
-      label: "Prove you're human",
-      actionText: "Start",
-      reward: 15,
-      completed: false,
-      onClick: () => window.open("https://t.me/your_project", "_blank"),
-    },
-    {
-      id: "connect-wallet",
-      label: "Connect to Metamask",
-      actionText: "Start",
-      reward: 30,
-      completed: false,
-      onClick: () => window.open("https://t.me/your_project", "_blank"),
-    },
-  ]);
-
+  const userId = id;
+  const [availableTasks, setAvailableTasks] = useState<Task[]>([]);
   const [claimedTasks, setClaimedTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleComplete = (id: string) => {
-    setAvailableTasks((prev) => {
-      const taskIndex = prev.findIndex((task) => task.id === id);
-      if (taskIndex !== -1) {
-        const updatedTask = { ...prev[taskIndex], completed: true };
-        const updatedAvailableTasks = [...prev];
-        updatedAvailableTasks[taskIndex] = updatedTask;
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const response = await fetch(`${API_URL}/tasks/${userId}`);
+        const data = await response.json();
 
-        // Move the completed task to claimed
-        setClaimedTasks((claimedPrev) => [...claimedPrev, updatedTask]);
-
-        return updatedAvailableTasks.filter((task) => task.id !== id); // Remove the task from available
+        if (data.success) {
+          setAvailableTasks(data.data.availableTasks);
+          setClaimedTasks(data.data.claimedTasks);
+        }
+      } catch (error) {
+        console.error("Failed to fetch tasks:", error);
+      } finally {
+        setLoading(false);
       }
-      return prev;
-    });
+    };
+
+    fetchTasks();
+  }, [userId]);
+
+  const handleComplete = async (taskId: string) => {
+    try {
+      const task = availableTasks.find(t => t.id === taskId);
+      if (!task) return;
+
+      if (task.completed && task.isDaily && task.canClaimAfter) {
+        const now = new Date();
+        const canClaimAfter = new Date(task.canClaimAfter);
+
+        if (now.getTime() < canClaimAfter.getTime()) {
+          const hoursLeft = Math.ceil((canClaimAfter.getTime() - now.getTime()) / (1000 * 60 * 60));
+          alert(`You can claim this again in ${hoursLeft} hours`);
+          return;
+        }
+      }
+
+      const response = await fetch(`${API_URL}/tasks/complete`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId, taskId })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        if (task.isDaily) {
+          setAvailableTasks(prev => prev.map(t =>
+            t.id === task.id ? { ...t, canClaimAfter: data.canClaimAfter } : t
+          ));
+        } else {
+          setAvailableTasks(prev => prev.filter(t => t.id !== task.id));
+          setClaimedTasks(prev => [...prev, { ...task, completed: true }]);
+        }
+
+        alert(`Success! You earned +${data.reward} Hash Rate`);
+      }
+    } catch (error) {
+      console.error("Failed to complete task:", error);
+    }
   };
+
+  const getTaskIcon = (icon: string) => {
+    switch (icon) {
+      case 'gift': return <TfiGift className="text-blue-500 text-2xl" />;
+      case 'twitter': return <FaTwitter className="text-blue-500 text-2xl" />;
+      case 'telegram': return <FaTelegramPlane className="text-blue-600 text-2xl" />;
+      case 'shield': return <FaShieldAlt className="text-blue-600 text-2xl" />;
+      case 'wallet': return <FaWallet className="text-blue-600 text-2xl" />;
+      default: return <TfiGift className="text-blue-500 text-2xl" />;
+    }
+  };
+
+  if (loading) {
+    return <div className="p-4 text-center">Loading tasks...</div>;
+  }
 
   return (
     <div className="p-4 space-y-4">
@@ -82,67 +109,70 @@ const Tasks = () => {
       <div className="flex justify-between bg-gray-200 px-4 py-2 mt-4 border rounded-xl mx-2">
         <p>Available</p>
       </div>
-      {availableTasks.map((task) => (
-        <div
-          key={task.id}
-          className="flex items-center justify-between px-4 py-1 border rounded-xl bg-white shadow"
-        >
-          <div className="flex items-center space-x-2">
-            {task.id === "daily" && <TfiGift className="text-blue-500 text-2xl" />}
-            {task.id === "follow-twitter" && <FaTwitter className="text-blue-500 text-2xl" />}
-            {task.id === "join-telegram" && <FaTelegramPlane className="text-blue-600 text-2xl" />}
-            {task.id === "anti-bot" && <FaTelegramPlane className="text-blue-600 text-2xl" />}
-            {task.id === "connect-wallet" && <FaTelegramPlane className="text-blue-600 text-2xl" />}
+      {availableTasks.length > 0 ? (
+        availableTasks.map((task) => (
+        <div key={task.id} className="flex items-center justify-between px-4 py-3 border rounded-xl bg-white shadow">
+          <div className="flex items-center space-x-3">
+            {getTaskIcon(task.icon)}
             <div>
               <p className="font-semibold">{task.label}</p>
               <p className="text-sm text-gray-500">+{task.reward} Hash Rate</p>
+              {task.completed && task.isDaily && task.canClaimAfter && (
+                <p className="text-xs text-yellow-600">
+                  Available again at: {new Date(task.canClaimAfter).toLocaleString()}
+                </p>
+              )}
             </div>
           </div>
 
-          {task.completed ? (
-            <div className="flex items-center text-green-600 space-x-1">
-              <FaCheckCircle />
-            </div>
-          ) : (
-            <button
-              onClick={() => {
-                task.onClick();
-                handleComplete(task.id);
+          <button
+            onClick={() => {
+              window.open(task.url, '_blank');
+              handleComplete(task.id);
+            }}
+            className="text-white px-4 py-2 rounded-2xl"
+            disabled={task.completed && task.isDaily && !!task.canClaimAfter && new Date() < new Date(task.canClaimAfter)}
+          >
+            <img
+              src="/images/arrowtask.svg"
+              className="h-5 w-5"
+              style={{
+                opacity: task.completed && task.isDaily && !!task.canClaimAfter && new Date() < new Date(task.canClaimAfter) ? 0.5 : 1
               }}
-              className="text-white px-4 py-2 rounded-2xl"
-            >
-              <img src="/images/arrowtask.svg" className="h-5 w-5" />
-            </button>
-          )}
+            />
+          </button>
         </div>
-      ))}
+      ))
+      ) : (
+        <p className="text-center text-gray-500 py-4">No available tasks</p>
+      )}
 
       {/* Claimed Tasks Section */}
       <div className="flex justify-between bg-gray-200 px-4 py-2 mt-4 border rounded-xl mx-2">
         <p>Claimed</p>
       </div>
-      {claimedTasks.map((task) => (
-        <div
-          key={task.id}
-          className="flex items-center justify-between px-4 py-1 border rounded-xl bg-white shadow"
-        >
-          <div className="flex items-center space-x-3">
-            {task.id === "daily" && <TfiGift className="text-blue-500 text-2xl" />}
-            {task.id === "follow-twitter" && <FaTwitter className="text-blue-500 text-2xl" />}
-            {task.id === "join-telegram" && <FaTelegramPlane className="text-blue-600 text-2xl" />}
-            {task.id === "anti-bot" && <FaTelegramPlane className="text-blue-600 text-2xl" />}
-            {task.id === "connect-wallet" && <FaTelegramPlane className="text-blue-600 text-2xl" />}
-            <div>
-              <p className="font-semibold">{task.label}</p>
-              <p className="text-sm text-gray-500">+{task.reward} Hash Rate</p>
+      {claimedTasks.length > 0 ? (
+        claimedTasks.map((task) => (
+          <div
+            key={task.id}
+            className="flex items-center justify-between px-4 py-3 border rounded-xl bg-white shadow"
+          >
+            <div className="flex items-center space-x-3">
+              {getTaskIcon(task.icon)}
+              <div>
+                <p className="font-semibold">{task.label}</p>
+                <p className="text-sm text-gray-500">+{task.reward} Hash Rate</p>
+              </div>
+            </div>
+
+            <div className="flex items-center text-green-600 space-x-1">
+              <FaCheckCircle />
             </div>
           </div>
-
-          <div className="flex items-center text-green-600 space-x-1">
-            <FaCheckCircle />
-          </div>
-        </div>
-      ))}
+        ))
+      ) : (
+        <p className="text-center text-gray-500 py-4">No claimed tasks yet</p>
+      )}
     </div>
   );
 };
