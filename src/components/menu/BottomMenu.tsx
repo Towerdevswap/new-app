@@ -1,9 +1,9 @@
 import { useRouter } from "next/router";
 import { FaTasks } from "react-icons/fa";
 import { GoHome } from "react-icons/go";
-import { MdOutlineExplore } from "react-icons/md";
+import { MdOutlineExplore, MdOutlineGamepad } from "react-icons/md";
 import { CgProfile } from "react-icons/cg";
-import { GiMining } from "react-icons/gi";
+// import { GiMining } from "react-icons/gi";
 import MenuButton from "./MenuButton";
 
 const BottomMenu = () => {
@@ -26,6 +26,12 @@ const BottomMenu = () => {
           onClick={() => router.push("/explore")}
         />
         <MenuButton
+          icon={<MdOutlineGamepad />}
+          label="Game"
+          active={current === "game"}
+          onClick={() => router.push("/game")}
+        />
+        {/* <MenuButton
           icon={<GiMining />}
           label="Mining"
           active={current === "mining"}
@@ -35,7 +41,7 @@ const BottomMenu = () => {
               ? "bg-gradient-to-br from-yellow-300 to-yellow-500 text-white shadow-2xl scale-110"
               : "bg-yellow-100 text-yellow-700"
           }`}
-         />
+         /> */}
         <MenuButton
           icon={<FaTasks />}
           label="Tasks"

@@ -14,66 +14,128 @@ type Activity = {
   timestamp: string;
 };
 
-const mockUser = {
-  image: "https://i.pravatar.cc/150?img=5",
-  firstname: "Alexcccccc",
-  username: "@bullpad_user",
-  followers: 120,
-  following: 88,
-  posts: [
-    { id: 1, content: "Just launched my first farming pool!", timestamp: "1h ago" },
-    { id: 2, content: "Earned 10k BULL from staking!", timestamp: "3d ago" },
-  ] as Post[],
-  activities: [
-    { id: 1, description: "Started following @coredev", timestamp: "2h ago" },
-    { id: 2, description: "Claimed daily reward", timestamp: "1d ago" },
-  ] as Activity[],
+type User = {
+  id: number;
+  image: string;
+  firstname: string;
+  username: string;
+  followers: number;
+  following: number;
+  posts: Post[];
+  activities: Activity[];
+  isFollowing?: boolean;
 };
 
 const Profile = () => {
   const [tab, setTab] = useState<"activity" | "post">("activity");
+  const [user, setUser] = useState<User>({
+    id: 0,
+    image: "https://i.pravatar.cc/150?img=5",
+    firstname: "Alexcccccc",
+    username: "@bullpad_user",
+    followers: 120,
+    following: 88,
+    posts: [
+      { id: 1, content: "Just launched my first farming pool!", timestamp: "1h ago" },
+      { id: 2, content: "Earned 10k BULL from staking!", timestamp: "3d ago" },
+    ],
+    activities: [
+      { id: 1, description: "Started following @coredev", timestamp: "2h ago" },
+      { id: 2, description: "Claimed daily reward", timestamp: "1d ago" },
+    ],
+    isFollowing: false
+  });
 
   useEffect(() => {
-    // Only use the id from telegram utils since username and firstname aren't used
+    const fetchProfile = async () => {
+      try {
+        // Fetch profile data
+        const profileResponse = await fetch(`${API_URL}/profiles/${id}`);
+        const profileData = await profileResponse.json();
+
+        // Fetch follow status
+        const followStatusResponse = await fetch(`${API_URL}/follow-status/${id}/${profileData.id}`);
+        const followStatus = await followStatusResponse.json();
+
+        setUser({
+          ...profileData,
+          isFollowing: followStatus.isFollowing
+        });
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+      }
+    };
+
     if (id) {
-      // Kirim data ke backend untuk disimpan
-      fetch(`${API_URL}/profiles/create`, {
-        method: "POST",
+      fetchProfile();
+    }
+  }, [id]);
+
+  const handleFollow = async () => {
+    try {
+      const response = await fetch(`${API_URL}/follow`, {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          telegramId: id,
-          username: mockUser.username, // Using mock data instead
-          firstname: mockUser.firstname, // Using mock data instead
-          image: mockUser.image,
-          followers: mockUser.followers,
-          following: mockUser.following,
-        }),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          console.log("Profile saved:", data);
+          followerId: id,
+          followingId: user.id
         })
-        .catch((error) => {
-          console.error("Error saving profile:", error);
-        });
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setUser(prev => ({
+          ...prev,
+          isFollowing: true,
+          followers: prev.followers + 1
+        }));
+      }
+    } catch (error) {
+      console.error("Error following user:", error);
     }
-  }, [id]); // Only include id in dependencies since it's the only one used
+  };
+
+  const handleUnfollow = async () => {
+    try {
+      const response = await fetch(`${API_URL}/unfollow`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          followerId: id,
+          followingId: user.id
+        })
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setUser(prev => ({
+          ...prev,
+          isFollowing: false,
+          followers: prev.followers - 1
+        }));
+      }
+    } catch (error) {
+      console.error("Error unfollowing user:", error);
+    }
+  };
 
   return (
-    <div className="pb-4 bg-white rounded-lg">
+    <div className="pb-4 bg-gradient-to-r from-slate-100 to-gray-100 rounded-lg">
       {/* Banner */}
       <div className="relative">
         <img
-          src={mockUser.image}
+          src={user.image}
           alt="Banner"
           className="w-full h-28 object-cover rounded-t-lg"
         />
         {/* Profile Image */}
-        <div className="absolute left-1/2 transform -translate-x-1/2 -bottom-12">
+        <div className="absolute top-22 transform -translate-y-1/2 ml-2">
           <img
-            src={mockUser.image}
+            src={user.image}
             alt="Profile"
             className="w-24 h-24 rounded-full border-4 border-white shadow"
           />
@@ -81,24 +143,36 @@ const Profile = () => {
       </div>
 
       {/* Space bawah untuk profil */}
-      <div className="mt-12 flex flex-col items-center ">
-        <h2 className="text-lg font-bold">{mockUser.firstname}</h2>
-        <p className="text-sm mb-2 -mt-1">{mockUser.username}</p>
+      <div className="mt-12 flex flex-col mx-4">
+      <div className="flex justify-between mb-4">
+      <div>
+        <h2 className="text-lg font-bold">{user.firstname} </h2>
+        <p className="text-xs ">{user.username}</p>
+      </div>
+      <button
+            onClick={user.isFollowing ? handleUnfollow : handleFollow}
+            className={`text-sm border rounded-xl px-4 py-1 absolute transform -translate-y-1/2 right-2 ${
+              user.isFollowing ? 'bg-gray-200' : 'bg-yellow-300'
+            }`}
+          >
+            {user.isFollowing ? 'Following' : 'Follow'}
+          </button>
+        </div>
         <div className="flex space-x-6 text-sm text-gray-600 ">
           <div>
-            <span className="font-bold text-black">{mockUser.followers}</span> Followers
+            <span className="font-bold text-black">{user.followers}</span> Followers
           </div>
           <div>
-            <span className="font-bold text-black">{mockUser.following}</span> Following
+            <span className="font-bold text-black">{user.following}</span> Following
           </div>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex justify-center gap-4 mt-6 mb-2">
+      <div className="flex gap-4 mt-6 mb-2 mx-4">
         <button
           onClick={() => setTab("activity")}
-          className={`flex rounded-full items-center text-sm px-4 py-1 ${
+          className={`flex rounded-xl items-center text-sm px-4 py-1 ${
             tab === "activity" ? "border-b-2 border-blue-500 text-blue-600" : "text-gray-500"
           }`}
         >
@@ -107,7 +181,7 @@ const Profile = () => {
         </button>
         <button
           onClick={() => setTab("post")}
-          className={`flex rounded-full items-center text-sm px-4 py-1 ${
+          className={`flex rounded-xl items-center text-sm px-4 py-1 ${
             tab === "post" ? "border-b-2 border-blue-500 text-blue-600" : "text-gray-500"
           }`}
         >
@@ -119,9 +193,9 @@ const Profile = () => {
       {/* Content */}
       <div className="mt-4 space-y-4 pb-20 px-4 border-t-2 border-blue-200 pt-4 rounded-2xl">
         {tab === "activity" ? (
-          mockUser.activities.length > 0 ? (
-            mockUser.activities.map((activity) => (
-              <div key={activity.id} className="flex justify-between items-center bg-gray-100 p-3 rounded text-sm">
+          user.activities.length > 0 ? (
+            user.activities.map((activity) => (
+              <div key={activity.id} className="flex justify-between items-center border shadow-md p-3 rounded text-sm">
                 <p>{activity.description}</p>
                 <span className="text-xs text-gray-500">{activity.timestamp}</span>
               </div>
@@ -129,9 +203,9 @@ const Profile = () => {
           ) : (
             <p className="text-sm text-gray-500">No recent activity.</p>
           )
-        ) : mockUser.posts.length > 0 ? (
-          mockUser.posts.map((post) => (
-            <div key={post.id} className="flex justify-between items-center bg-gray-100 p-3 rounded text-sm">
+        ) : user.posts.length > 0 ? (
+          user.posts.map((post) => (
+            <div key={post.id} className="flex justify-between items-center border shadow-md p-3 rounded text-sm">
               <p>{post.content}</p>
               <span className="text-xs text-gray-500">{post.timestamp}</span>
             </div>
